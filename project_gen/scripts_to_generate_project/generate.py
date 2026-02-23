@@ -26,7 +26,7 @@ def genearte_api(
                "--skip-validate-spec",
                ]
     if templates:
-        command.extend(["-t", templates]
+        command.extend(["-t", templates])
     run_command(command)
 
 
