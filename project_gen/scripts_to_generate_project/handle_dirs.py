@@ -1,4 +1,5 @@
 import os
+import pathlib
 import shutil
 import time
 from pathlib import Path
@@ -86,3 +87,24 @@ def move_directory_contents(src, dst):
 #         shutil.rmtree(client_dir)
 #     shutil.move(f"{package_name}/{package_name}", client_dir)
 #     shutil.rmtree(package_name)
+
+def replace_imports_in_files(directory: str, package_name: str) -> None:
+    from_search_pattern = f"from {package_name}"
+    import_search_pattern = f"import {package_name}"
+    replace_pattern = f"clients.http.{package_name}"
+    path = pathlib.Path(directory)
+    for file_path in path.rglob("*.py"):
+        print(f"Start fixing file '{file_path}'")
+        with open(file_path, "r", encoding="utf-8") as file:
+            lines =file.readlines()
+
+        updated_lines = []
+        for line in lines:
+            line = line.replace(from_search_pattern, f"from {replace_pattern}")
+            line = line.replace(import_search_pattern, f"import {replace_pattern}")
+            line = line.replace(f"getattr({package_name}.models, klass)",
+                                f"getattr(clients.http.{package_name}.models, klass)")
+            updated_lines.append(line)
+
+        with file_path.open("w", encoding="utf-8") as file:
+            file.writelines(updated_lines)

@@ -6,6 +6,7 @@ from project_gen.scripts_to_generate_project.handle_dirs import (
     move_directory_contents,
     get_bin_dir,
     safe_remove_dir,
+    replace_imports_in_files,
 )
 from project_gen.scripts_to_generate_project.utils import run_command
 
@@ -49,3 +50,5 @@ genearte_api(package_name=package_name, swagger_url=swagger_url, openapi_generat
 dst_folder = str(pathlib.Path(__file__).parent.parent.parent / f"clients/http/{package_name}")
 move_directory_contents(f"{package_name}/{package_name}", dst_folder)
 safe_remove_dir(package_name)
+
+replace_imports_in_files(directory=dst_folder, package_name=package_name)
