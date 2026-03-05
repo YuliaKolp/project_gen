@@ -68,6 +68,7 @@ def move_directory_contents(src, dst):
             if os.path.exists(dst_path):
                 if os.path.isdir(dst_path):
                     shutil.rmtree(dst_path)
+                    print(f"WARNING directory '{dst_path}' is removed")
                 else:
                     os.remove(dst_path)
             # Move the item
@@ -76,7 +77,6 @@ def move_directory_contents(src, dst):
         except Exception as e:
             print(f"Error moving {item}: {e}")
 
-    # Remove source dir
     print("\n" + "=" * 50)
     print(f"\nProject location: '{dst.absolute()}'")
 

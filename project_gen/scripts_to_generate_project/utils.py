@@ -1,3 +1,4 @@
+import pathlib
 import subprocess
 import sys
 from pathlib import Path
@@ -34,36 +35,47 @@ def get_git_rerository_info() -> str:
     remote = remote_url.split("/")[-1].split(".git")[0]
     return remote
 
-def create_project() -> None:
+def create_project(template: str) -> None:
+    template = template or str(Path(__file__).parent.parent / "templates" / "project")
     print("Creating project")
     check_git_repository()
     user_email, authors = get_git_user_info()
     remote = get_git_rerository_info()
-    parent_dir = Path().cwd()
+    parent_dir = pathlib.Path(__file__).parent
+
+    output_dir = pathlib.Path(__file__).parent.parent / f"output_dir"
     extra_context = {
         "user_email": user_email,
         "authors": authors,
         "project_name": remote,
         "repository": remote,
     }
-    cookiecutter(
-        template=r"C:\Users\skolp\PycharmProjects\template",
-        no_input=True,
-        overwrite_if_exists=True,
-        output_dir=parent_dir,
-        extra_context=extra_context,
-    )
-    print("Project is created")
+    # print(f"parent_dir '{parent_dir}'")
+    # print(f"parent_dir .parent  '{parent_dir.parent}'")
+    # print(f"output_dir '{output_dir}'")
+    #
+    # print(f"Path.cwd() '{Path.cwd()}'")
+    # print(f"Path.cwd().name '{Path.cwd().name}'")
 
-
-
-if __name__ == '__main__':
     try:
-        create_project()
+        cookiecutter(
+            template=template,
+            no_input=True,
+            overwrite_if_exists=True,
+            output_dir=output_dir,
+            extra_context=extra_context,
+        )
     except Exception as e:
         print(f"Error on project creation via cookiecutter : {e}")
     finally:
         src = Path.cwd()
-        dst = src.parent
+        dst = parent_dir.parent
         print('--' * 32)
         move_directory_contents(src, dst)
+    print("Project is created")
+
+
+def setup(template: str | None = None) -> None:
+    check_git_repository()
+    create_project(template)
+

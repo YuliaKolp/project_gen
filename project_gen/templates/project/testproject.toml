@@ -1,0 +1,7 @@
+[[http]]
+service_name = "register_service"
+swagger = "http://185.185.143.231:8085/register/openapi.json"
+
+[[http]]
+service_name = "mail_service"
+swagger = "http://185.185.143.231:8085/mail/openapi.json"

@@ -8,7 +8,12 @@ import warnings
 from project_gen.scripts_to_generate_project.handle_dirs import get_bin_dir
 
 
-def download(url: str) -> str:
+OPENAPI_URL = "https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/7.16.0/openapi-generator-cli-7.16.0.jar"
+
+
+def download(
+        url: str=OPENAPI_URL
+        ) -> str:
     """
     :param url: file tp download
     :return: path where downloaded file is saved (bin/Script folder)
@@ -33,3 +38,13 @@ def download(url: str) -> str:
     shutil.move(file_name, dest_path)
     print(f"File is downloaded to '{dest_path}'")
     return dest_path
+
+
+def init() -> str:
+    openapi_generator_jar = os.path.join(get_bin_dir(), OPENAPI_URL.split("/")[-1])
+    if os.path.exists(openapi_generator_jar) and os.path.getsize(openapi_generator_jar):
+        print(f"'{openapi_generator_jar}' already exists. It is no need to download it.")
+    else:
+        openapi_generator_jar = download(url=OPENAPI_URL)
+
+    return openapi_generator_jar
