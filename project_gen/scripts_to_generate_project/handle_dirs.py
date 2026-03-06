@@ -4,6 +4,7 @@ import shutil
 import time
 from pathlib import Path
 
+
 def get_bin_dir() -> str:
     venv_path = os.environ.get('VIRTUAL_ENV')
     if os.name == 'nt':
@@ -12,11 +13,12 @@ def get_bin_dir() -> str:
         bin_dir = os.path.join(venv_path, 'bin')
     return bin_dir
 
+
 def safe_remove_dir(
         folder_name,
         max_attempts=3,
         delay=1
-        ):
+):
     """Safe dir removing with retries for Windows"""
     path = Path(folder_name)
 
@@ -44,7 +46,10 @@ def safe_remove_dir(
     return False
 
 
-def move_directory_contents(src, dst):
+def move_directory_contents(
+        src,
+        dst
+):
     """Move contents of src directory to dst, then remove src"""
     print(f"Moving contents from {src} to {dst}")
     cur_script_name = os.path.basename(__file__)
@@ -58,8 +63,13 @@ def move_directory_contents(src, dst):
         src_path = os.path.join(src, item)
         dst_path = os.path.join(dst, item)
 
+        # Skip files with script to generate project
+        if Path.cwd().name == 'scripts_to_generate_project':
+            continue
+
         # Skip .git and script files
-        if item in ['utils.py', 'generate.py', 'openapi-generator-cli-7.16.0.jar', cur_script_name, '.git', '.venv', '.idea', '__pycache__']:
+        if item in ['openapi-generator-cli-7.16.0.jar', cur_script_name, '.gitignore', 'LICENSE', 'poetry.lock',
+                    'pyproject.toml', 'README.md', 'testproject.toml', '.git', '.venv', '.idea', '__pycache__']:
             print(f'Skipping "{item}"')
             continue
 
@@ -88,7 +98,10 @@ def move_directory_contents(src, dst):
 #     shutil.move(f"{package_name}/{package_name}", client_dir)
 #     shutil.rmtree(package_name)
 
-def replace_imports_in_files(directory: str, package_name: str) -> None:
+def replace_imports_in_files(
+        directory: str,
+        package_name: str
+) -> None:
     from_search_pattern = f"from {package_name}"
     import_search_pattern = f"import {package_name}"
     replace_pattern = f"clients.http.{package_name}"
@@ -96,14 +109,16 @@ def replace_imports_in_files(directory: str, package_name: str) -> None:
     for file_path in path.rglob("*.py"):
         print(f"Start fixing file '{file_path}'")
         with open(file_path, "r", encoding="utf-8") as file:
-            lines =file.readlines()
+            lines = file.readlines()
 
         updated_lines = []
         for line in lines:
             line = line.replace(from_search_pattern, f"from {replace_pattern}")
             line = line.replace(import_search_pattern, f"import {replace_pattern}")
-            line = line.replace(f"getattr({package_name}.models, klass)",
-                                f"getattr(clients.http.{package_name}.models, klass)")
+            line = line.replace(
+                f"getattr({package_name}.models, klass)",
+                f"getattr(clients.http.{package_name}.models, klass)"
+            )
             updated_lines.append(line)
 
         with file_path.open("w", encoding="utf-8") as file:

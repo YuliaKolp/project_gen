@@ -1,11 +1,10 @@
-import pathlib
+import os
 import subprocess
 import sys
+import traceback
 from pathlib import Path
 
 from cookiecutter.main import cookiecutter
-
-from project_gen.scripts_to_generate_project.handle_dirs import move_directory_contents
 
 
 def run_command(command:list[str]) -> str:
@@ -41,22 +40,18 @@ def create_project(template: str) -> None:
     check_git_repository()
     user_email, authors = get_git_user_info()
     remote = get_git_rerository_info()
-    parent_dir = pathlib.Path(__file__).parent
 
-    output_dir = pathlib.Path(__file__).parent.parent / f"output_dir"
+    venv_dir = os.environ.get('VIRTUAL_ENV')
+    root_project_dir = os.path.dirname(venv_dir)
+
+    output_dir = os.path.join(root_project_dir, "output_dir")
+
     extra_context = {
         "user_email": user_email,
         "authors": authors,
         "project_name": remote,
         "repository": remote,
     }
-    # print(f"parent_dir '{parent_dir}'")
-    # print(f"parent_dir .parent  '{parent_dir.parent}'")
-    # print(f"output_dir '{output_dir}'")
-    #
-    # print(f"Path.cwd() '{Path.cwd()}'")
-    # print(f"Path.cwd().name '{Path.cwd().name}'")
-
     try:
         cookiecutter(
             template=template,
@@ -66,13 +61,10 @@ def create_project(template: str) -> None:
             extra_context=extra_context,
         )
     except Exception as e:
-        print(f"Error on project creation via cookiecutter : {e}")
+        print(f"Предупреждение: возникла ошибка в хуке, но она проигнорирована: {e}")
+        traceback.print_exc()
     finally:
-        src = Path.cwd()
-        dst = parent_dir.parent
-        print('--' * 32)
-        move_directory_contents(src, dst)
-    print("Project is created")
+        sys.exit(0)
 
 
 def setup(template: str | None = None) -> None:

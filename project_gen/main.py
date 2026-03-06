@@ -30,6 +30,8 @@ def init_command() -> None:
     init()
 
 cli.add_command(generate_command)
+cli.add_command(setup_command)
+cli.add_command(init_command)
 
 if __name__ == '__main__':
     cli()
