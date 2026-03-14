@@ -1,3 +1,5 @@
+import os
+
 import click
 
 from project_gen.scripts_to_generate_project.download import init
@@ -21,9 +23,12 @@ def setup_command(template: str | None) -> None:
     setup(template=template)
     init()
 
+
 @cli.command("generate")
-def generate_command() -> None:
-    generate()
+@click.option("--templates", "-t", required=False, default=None)
+def generate_command(templates: str | None) -> None:
+    generate(templates=templates)
+
 
 @cli.command("init")
 def init_command() -> None:

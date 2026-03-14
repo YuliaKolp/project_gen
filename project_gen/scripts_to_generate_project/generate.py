@@ -32,16 +32,22 @@ def generate_api(
 
 
 def generate(templates: str | None = None) -> None:
-    with open('testproject.toml') as config_file:
+    templates = templates or str(pathlib.Path(__file__).parent.parent / "templates" / "python")
+    testproject_toml = os.path.join(str(pathlib.Path(__file__).parent.parent / "templates" / "project"), 'testproject.toml')
+
+    venv_path = os.environ.get('VIRTUAL_ENV')
+    project_root = os.path.dirname(venv_path)
+
+    with open(testproject_toml) as config_file:
         config = toml.load(config_file)
 
     for http_service in config["http"]:
         package_name = http_service["service_name"].replace('-', '_')
-
         swagger_url = http_service["swagger"]
 
         openapi_generator_jar = init()
         generate_api(package_name=package_name, swagger_url=swagger_url, openapi_generator_jar=openapi_generator_jar, templates=templates)
-        dst_folder = str(pathlib.Path(__file__).parent.parent.parent / f"clients/http/{package_name}")
+        dst_folder = os.path.join(project_root, "clients", "http", package_name)
         move_directory_contents(f"{package_name}/{package_name}", dst_folder)
         safe_remove_dir(package_name)
+
